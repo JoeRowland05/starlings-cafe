@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pigeons Cafe & Bistro | Bristol — Interactive 3D Plate Experience</title>
+  <meta name="description" content="Independent family-run cafe & bistro in Clifton, Bristol. Explore and plate 6 iconic UK cafe comfort dishes in interactive real-time 3D.">
+
+  <!-- Google Fonts: Fraunces (Editorial Serif) & Plus Jakarta Sans (Artisanal Modern Sans) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Three.js & GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <aside class="announcement-bar">
+    <span>Family-Run Cafe & Bistro</span>
+    <span class="dot">•</span>
+    <span>99 Queens Road, Clifton, Bristol BS8 1LW</span>
+    <span class="dot">•</span>
+    <span>Bottomless Brunch Available 7 Days</span>
+  </aside>
+
+  <!-- Sticky Site Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="#" class="brand-logo" id="logo-link">
+        <span class="logo-title">Pigeons</span>
+        <span class="logo-subtitle">Clifton • Bristol</span>
+      </a>
+
+      <nav class="main-nav">
+        <a href="#interactive-plate" class="nav-link active">The 3D Plate</a>
+        <a href="#cafe-dishes" class="nav-link">The 6 Dishes</a>
+        <a href="#our-story" class="nav-link">Our Story</a>
+        <a href="#bottomless-brunch" class="nav-link">Bottomless Brunch</a>
+      </nav>
+
+      <div class="header-actions">
+        <!-- Interactive Tactile Audio FX Toggle -->
+        <button id="sound-toggle" class="sound-toggle-btn" aria-label="Toggle Sound Effects">
+          <div class="sound-waves active" id="sound-wave-icon">
+            <span></span><span></span><span></span>
+          </div>
+          <span id="sound-label">Audio On</span>
+        </button>
+
+        <button class="btn-primary" id="open-reserve-btn">
+          <span>Book a Table</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO & INTERACTIVE 3D PLATE STUDIO -->
+    <section class="hero-plate-section" id="interactive-plate">
+      <div class="hero-intro">
+        <div class="badge-tag">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Interactive Bristol Cafe Studio
+        </div>
+        <h1>Modern British Comfort, <br><span class="highlight">Plated by You.</span></h1>
+        <p class="subtitle">
+          Explore six iconic UK cafe dishes served on our hand-thrown stoneware plate. 
+          Use your cursor to pick up, rearrange, and design your breakfast exactly as you like it.
+        </p>
+      </div>
+
+      <!-- Quick Dish Selector Pills (All 6 Dishes) -->
+      <div class="dish-pills-bar" id="dish-pills">
+        <button class="dish-pill active" data-dish-id="full-english">
+          <span>🍳 The Pigeons Full English</span>
+          <span class="dish-price">£14.50</span>
+        </button>
+        <button class="dish-pill" data-dish-id="fish-fingers">
+          <span>🐟 Fish Finger Brioche</span>
+          <span class="dish-price">£13.25</span>
+        </button>
+        <button class="dish-pill" data-dish-id="beans-on-toast">
+          <span>🫘 Smoky Sourdough Beans</span>
+          <span class="dish-price">£10.50</span>
+        </button>
+        <button class="dish-pill" data-dish-id="smoked-salmon">
+          <span>🍋 Severn & Wye Salmon</span>
+          <span class="dish-price">£13.95</span>
+        </button>
+        <button class="dish-pill" data-dish-id="fish-pie-bake">
+          <span>🥧 Jamie's Fish Pie Crostini</span>
+          <span class="dish-price">£14.00</span>
+        </button>
+        <button class="dish-pill" data-dish-id="sausage-roll">
+          <span>🥐 Pork & Apple Roll</span>
+          <span class="dish-price">£9.75</span>
+        </button>
+      </div>
+
+      <!-- 3D Experience Stage Layout -->
+      <div class="plate-stage-layout">
+        <!-- 3D Three.js Plate Area -->
+        <div class="plate-3d-wrapper">
+          <!-- Canvas Target -->
+          <div id="canvas-container"></div>
+
+          <!-- Helper Drag Cue -->
+          <div class="drag-hint-banner">
+            <span class="pulse-dot"></span>
+            <span>Click & drag items to move them around the plate</span>
+          </div>
+
+          <!-- Dynamic Ingredient Inspector HUD -->
+          <div class="food-inspector-badge" id="food-inspector-badge">
+            <div class="inspector-tag">Ingredient Spotlight</div>
+            <div class="inspector-title" id="inspector-title">Item Name</div>
+            <div class="inspector-desc" id="inspector-desc">Item description will appear here.</div>
+          </div>
+
+          <!-- Interactive Stage Controls -->
+          <div class="plate-stage-toolbar">
+            <div class="toolbar-group">
+              <button class="stage-btn" id="btn-reset-plate" title="Restore Chef Plating">
+                <span>🍽️ Chef's Plating</span>
+              </button>
+              <button class="stage-btn" id="btn-scatter-plate" title="Scatter Food Around Plate">
+                <span>🎲 Scatter</span>
+              </button>
+              <button class="stage-btn" id="btn-spin-plate" title="Spin Plate 360°">
+                <span>🔄 360° Spin</span>
+              </button>
+            </div>
+
+            <div class="toolbar-group">
+              <button class="stage-btn view-btn active" data-view="bistro" title="Bistro 45° Angle">
+                <span>Bistro View</span>
+              </button>
+              <button class="stage-btn view-btn" data-view="topdown" title="Overhead Top-Down Angle">
+                <span>Top-Down</span>
+              </button>
+              <button class="stage-btn view-btn" data-view="closeup" title="Close-Up Perspective">
+                <span>Detail</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dish Story & Nutritional Editorial Panel -->
+        <div class="dish-details-panel" id="dish-details-panel">
+          <div class="dish-header">
+            <span class="dish-time-badge" id="dish-time">Served All Day (8:00am - 3:30pm)</span>
+            <h2 class="dish-title" id="dish-title">The Pigeons Full English</h2>
+            <div class="dish-tagline" id="dish-tagline">The Quintessential Bristolian Morning Feast</div>
+            <div class="dish-price-tag" id="dish-price">£14.50</div>
+          </div>
+
+          <div class="dish-badges-row" id="dish-badges">
+            <span class="dish-meta-badge">Locally Sourced</span>
+            <span class="dish-meta-badge">GF Option Available</span>
+            <span class="dish-meta-badge">Bristol Roast Pairing</span>
+          </div>
+
+          <p class="dish-desc-text" id="dish-description">
+            Handmade Cumberland pork sausage, Sanridge Farm dry-cured streaky bacon, free-range fried egg with runny golden yolk, slow-roasted heritage tomato, thyme field mushrooms, house smoky baked beans and grilled artisan sourdough.
+          </p>
+
+          <div class="dish-quote-box" id="dish-quote">
+            “The gold standard of Bristol brunching — every ingredient has a story.”
+          </div>
+
+          <div class="pairing-box">
+            <div class="pairing-title">Recommended Pairing</div>
+            <div class="pairing-value" id="dish-pairing">BS1 Espresso Flat White or Pigeons Bloody Mary</div>
+          </div>
+
+          <div class="dish-actions">
+            <button class="btn-primary" id="btn-order-dish">
+              <span>Order for Table</span>
+            </button>
+            <button class="btn-secondary" id="btn-share-dish">
+              <span>Share Dish</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- THE 6 CAFE DISHES CATALOG GRID -->
+    <section class="dishes-catalog-section" id="cafe-dishes">
+      <div class="section-head">
+        <div class="badge-tag">Weekday & Weekend Menu</div>
+        <h2>Six Iconic British Cafe Classics</h2>
+        <p>From the hearty warmth of our Bristol morning fry-up to Jamie Oliver-inspired comfort bakes, each dish is handcrafted with seasonal West Country ingredients.</p>
+      </div>
+
+      <div class="dishes-grid" id="dishes-catalog-grid">
+        <!-- Dish Cards Generated by JS -->
+      </div>
+    </section>
+
+    <!-- BRISTOL PROVENANCE & FOUNDER STORY -->
+    <section class="story-provenance-section" id="our-story">
+      <div class="story-container">
+        <div class="story-content">
+          <div class="badge-tag">Beautifully Bristolian</div>
+          <h2>From Corporate Bristol to Clifton's Favorite Family Bistro</h2>
+          <p>
+            Pigeons was founded in the summer of 2022 by Edward Pigeon. Leaving the corporate world of KPMG behind, Ed pursued his true dream: building an independent foodie sanctuary celebrating wholesome, delicious British produce in the heart of Clifton.
+          </p>
+          <p>
+            Nothing is rushed, nothing is sourced from afar. Whether it’s sourdough baked around the corner, free-range sausages from Wiltshire, or oak-cured salmon from the Severn, our food represents the pinnacle of modern British cafe culture.
+          </p>
+
+          <div class="producer-grid">
+            <div class="producer-card">
+              <span class="producer-badge">Bakery</span>
+              <h4>Clifton Sourdough</h4>
+              <p>Naturally leavened 36-hour slow-ferment sourdough loaves delivered warm each morning.</p>
+            </div>
+            <div class="producer-card">
+              <span class="producer-badge">Smokehouse</span>
+              <h4>Severn & Wye</h4>
+              <p>Sustainable estuary cure smoked salmon and cured seafood from Gloucestershire.</p>
+            </div>
+            <div class="producer-card">
+              <span class="producer-badge">Dairy</span>
+              <h4>Montgomery's Cheddar</h4>
+              <p>Cave-aged 24-month unpasteurised West Country cheddar with deep savory crunch.</p>
+            </div>
+            <div class="producer-card">
+              <span class="producer-badge">Butcher</span>
+              <h4>Sanridge Farm</h4>
+              <p>Traditional beechwood dry-cured streaky bacon and rare-breed heritage pork.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="story-visual-box">
+          <div class="quote-ornament">“</div>
+          <blockquote>
+            We strive to make your visit a truly memorable experience every time and nothing is too much trouble. A heartfelt welcome awaits anyone who enters our door.
+          </blockquote>
+          <div class="founder-signature">Edward Pigeon</div>
+          <div class="founder-title">Founder, Pigeons Cafe & Bistro</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BOTTOMLESS BRUNCH & DAYTIME COCKTAILS -->
+    <section class="brunch-banner-section" id="bottomless-brunch">
+      <div class="brunch-box">
+        <div class="brunch-info">
+          <div class="badge-tag" style="background: rgba(255,255,255,0.18); color: #fff;">Weekend & Weekday Treat</div>
+          <h3>Why not join us for Bottomless Brunch?</h3>
+          <p>
+            Enjoy 90 minutes of unlimited chilled Prosecco, Buck’s Fizz, Aperol Spritz, or our spicy house Bloody Mary alongside any of our signature brunch or lunch dishes.
+          </p>
+        </div>
+        <div style="text-align: right;">
+          <div class="brunch-price">£35 <span>per person / 90 mins</span></div>
+          <button class="btn-primary" style="margin-top: 16px; background: #fff; color: var(--text-dark);" id="brunch-reserve-btn">
+            Book Bottomless Brunch
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- TABLE RESERVATION MODAL -->
+  <div class="modal-overlay" id="reserve-modal" role="dialog" aria-modal="true">
+    <div class="modal-window">
+      <button class="modal-close-btn" id="close-modal-btn" aria-label="Close modal">&times;</button>
+      <div class="badge-tag">Pigeons Clifton</div>
+      <h3 style="font-size: 1.8rem; margin-bottom: 8px;">Book a Table</h3>
+      <p style="font-size: 0.9rem; margin-bottom: 20px;">99 Queens Road, Clifton, Bristol BS8 1LW</p>
+
+      <form id="booking-form">
+        <div class="form-group">
+          <label for="book-name">Full Name</label>
+          <input type="text" id="book-name" required placeholder="e.g. Eleanor Vance">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label for="book-date">Date</label>
+            <input type="date" id="book-date" required>
+          </div>
+          <div class="form-group">
+            <label for="book-time">Time</label>
+            <select id="book-time" required>
+              <option value="09:00">9:00 AM (Breakfast)</option>
+              <option value="10:30">10:30 AM (Brunch)</option>
+              <option value="12:00" selected>12:00 PM (Lunch)</option>
+              <option value="13:30">1:30 PM (Late Lunch)</option>
+              <option value="15:00">3:00 PM (Afternoon Tea)</option>
+            </select>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label for="book-guests">Guests</label>
+            <select id="book-guests" required>
+              <option value="1">1 Person</option>
+              <option value="2" selected>2 People</option>
+              <option value="4">4 People</option>
+              <option value="6">6 People</option>
+              <option value="8+">8+ (Private Event)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="book-type">Experience</label>
+            <select id="book-type">
+              <option value="standard">Standard Cafe Table</option>
+              <option value="bottomless">Bottomless Brunch (£35)</option>
+              <option value="coffee-pastry">Quick Coffee & Pastry</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="book-notes">Special Requests / Allergies</label>
+          <textarea id="book-notes" rows="2" placeholder="Let us know if you need Gluten-Free options or a high chair..."></textarea>
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
+          Confirm Table Booking
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- SITE FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4 style="font-family: var(--font-serif); font-size: 1.6rem; letter-spacing: 0.05em;">PIGEONS</h4>
+        <p style="margin-top: 8px;">
+          An independent family-run cafe & bistro offering locally roasted Bristol coffee, modern sustainable British dishes, and a heartfelt welcome.
+        </p>
+        <p style="margin-top: 14px; font-weight: 600; color: #fff;">
+          Follow our daily bakes: <a href="https://www.instagram.com/starlings_bristol" target="_blank" style="color: var(--warm-gold);">@pigeons_bristol</a>
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Opening Hours</h4>
+        <ul>
+          <li><strong>Mon – Fri:</strong> 8:00am – 3:30pm</li>
+          <li><strong>Saturday:</strong> 9:00am – 4:30pm</li>
+          <li><strong>Sunday:</strong> 10:00am – 3:30pm</li>
+          <li style="margin-top: 10px; color: var(--warm-gold);">Evenings: Available for Private Venue Hire</li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Find Us</h4>
+        <p>
+          99 Queens Road,<br>
+          Clifton, Bristol<br>
+          BS8 1LW
+        </p>
+        <p style="margin-top: 10px;">
+          Tel: 01173 021141<br>
+          Email: pigeonscafebristol@gmail.com
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Menu Links</h4>
+        <ul>
+          <li><a href="#interactive-plate">The 3D Plate Experience</a></li>
+          <li><a href="#cafe-dishes">All-Day Brunch & Lunch</a></li>
+          <li><a href="#bottomless-brunch">Bottomless Brunch</a></li>
+          <li><a href="#our-story">Producer Provenance</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>&copy; 2026 Pigeons Bristol. Beautifully Bristolian.</div>
+      <div>Designed with Three.js &amp; GSAP.</div>
+    </div>
+  </footer>
+
+  <!-- Application Logic Scripts -->
+  <script src="js/audio.js"></script>
+  <script src="js/food-models.js"></script>
+  <script src="js/plate-scene.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
